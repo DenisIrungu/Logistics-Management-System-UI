@@ -93,9 +93,9 @@ class _SignInScreenState extends State<SignInScreen> {
               ),
               SizedBox(height: 20),
               MyTextField(
-                controller:  emailController,
-                hintText:'  Email Address',
-                labelText:' Email Address',
+                controller: emailController,
+                hintText: '  Email Address',
+                labelText: ' Email Address',
                 obscureText: false,
                 keyboardType: TextInputType.emailAddress,
                 prefixIcon:
@@ -139,9 +139,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 },
               ),
               SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 Row(
                   children: [
                     Checkbox(
@@ -174,7 +172,9 @@ class _SignInScreenState extends State<SignInScreen> {
               ]),
               SizedBox(height: 100),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(context, '/admindashboard');
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF0F0156), // Dark blue button
                   minimumSize: Size(200, 50),

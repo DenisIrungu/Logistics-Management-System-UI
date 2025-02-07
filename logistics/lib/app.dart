@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:logistcs/appView.dart';
+import 'package:logistcs/screens/admindashboard.dart';
 import 'package:logistcs/screens/onboardingscreen.dart';
 import 'package:logistcs/screens/sign_in_screen.dart';
+import 'package:logistcs/screens/usermanager.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -15,7 +17,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme(
             primary: Color(0xFFFFFFFF), // Texts on blue background
             onPrimary: Color(0xFFFF9500), // Border
-            secondary: Color(0xFFD9D9D9), // Secondary color
+            secondary: Color(0xFFD9D9D8), // Secondary color
             onSecondary: Colors.black, // Text/icon color on secondary
             error: Colors.red, // Error color
             onError: Colors.green,
@@ -28,7 +30,9 @@ class MyApp extends StatelessWidget {
         home: AppView(),
         routes: {
           '/onboaradingscreen': (context)=> const OnBoardingScreen(),
-          '/signinscreen': (context)=> const SignInScreen()
+          '/signinscreen': (context)=> const SignInScreen(),
+          '/admindashboard': (context)=>  Admindashboard(),
+          '/usermanagement': (context)=> UserManagement()
         }
         
         

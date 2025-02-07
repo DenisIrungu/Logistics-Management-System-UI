@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 
 class MyContainer extends StatelessWidget {
   final String text;
+  final Color? color;
+  final Icon? icon;
+  final VoidCallback? onTap;
 
-  const MyContainer({required this.text, super.key});
+  MyContainer(
+      {required this.text, this.color, this.icon, this.onTap, super.key});
 
   @override
   Widget build(BuildContext context) {
