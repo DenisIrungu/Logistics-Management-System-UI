@@ -5,7 +5,7 @@ class MyTextField extends StatefulWidget {
   final String labelText;
   final String hintText;
   final bool obscureText;
-  final TextInputType keyboardType;
+  final TextInputType? keyboardType;
   final Widget? suffixIcon;
   final VoidCallback? onTap;
   final Widget? prefixIcon;
@@ -21,7 +21,7 @@ class MyTextField extends StatefulWidget {
       required this.labelText,
       required this.hintText,
       required this.obscureText,
-      required this.keyboardType,
+      this.keyboardType,
       this.suffixIcon,
       this.onTap,
       this.prefixIcon,
@@ -53,7 +53,7 @@ class _MyTextFieldState extends State<MyTextField> {
           labelText: widget.labelText,
           suffix: widget.suffixIcon,
           prefix: widget.prefixIcon,
-          errorText:widget.errorMsg,
+          errorText: widget.errorMsg,
           labelStyle: TextStyle(color: Color(0xFF303F9F)),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           enabledBorder: OutlineInputBorder(

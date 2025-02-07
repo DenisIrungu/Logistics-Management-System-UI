@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class MyGrid extends StatelessWidget {
-  final IconData icon;
+  final IconData? icon;
   final String title;
   final Color color;
   final VoidCallback? onTap;
 
   const MyGrid(
-      {required this.icon,
+      {this.icon,
       required this.title,
       required this.color,
       this.onTap,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:logistcs/appView.dart';
 import 'package:logistcs/screens/admindashboard.dart';
 import 'package:logistcs/screens/onboardingscreen.dart';
+import 'package:logistcs/screens/rider_management.dart';
 import 'package:logistcs/screens/sign_in_screen.dart';
 import 'package:logistcs/screens/usermanager.dart';
 
@@ -11,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
+        debugShowCheckedModeBanner: false,
         title: 'Dropu Logistics',
         theme: ThemeData(
           colorScheme: ColorScheme(
@@ -25,17 +26,14 @@ class MyApp extends StatelessWidget {
             onSurface: Colors.white,
             brightness: Brightness.light,
           ),
-        
         ),
         home: AppView(),
         routes: {
-          '/onboaradingscreen': (context)=> const OnBoardingScreen(),
-          '/signinscreen': (context)=> const SignInScreen(),
-          '/admindashboard': (context)=>  Admindashboard(),
-          '/usermanagement': (context)=> UserManagement()
-        }
-        
-        
-        );
+          '/onboaradingscreen': (context) => const OnBoardingScreen(),
+          '/signinscreen': (context) => const SignInScreen(),
+          '/admindashboard': (context) => Admindashboard(),
+          '/usermanagement': (context) => UserManagement(),
+          '/ridermanagement': (context) => RiderManagement(),
+        });
   }
 }
