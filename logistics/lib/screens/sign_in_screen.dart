@@ -133,7 +133,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a password';
                   } else if (!passWordRegExp.hasMatch(value)) {
-                    return 'Password enter a valid password';
+                    return 'Please enter a valid password';
                   }
                   return null;
                 },

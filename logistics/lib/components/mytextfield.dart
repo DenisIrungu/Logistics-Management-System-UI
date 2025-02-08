@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 
 class MyTextField extends StatefulWidget {
   final TextEditingController controller;
-  final String labelText;
+  final String? labelText;
   final String hintText;
+  final Color background;
   final bool obscureText;
+  final Color hintTextColor;
+  final Color labelTextColor;
   final TextInputType? keyboardType;
   final Widget? suffixIcon;
   final VoidCallback? onTap;
@@ -18,9 +21,12 @@ class MyTextField extends StatefulWidget {
 
   MyTextField(
       {required this.controller,
-      required this.labelText,
+      this.labelText,
       required this.hintText,
       required this.obscureText,
+      this.background = const Color(0xFFDFDEE8),
+      this.hintTextColor = const Color(0xFF000000),
+      this.labelTextColor = const Color(0xFF303F9F),
       this.keyboardType,
       this.suffixIcon,
       this.onTap,
@@ -46,15 +52,15 @@ class _MyTextFieldState extends State<MyTextField> {
         controller: widget.controller,
         keyboardType: widget.keyboardType,
         decoration: InputDecoration(
-          fillColor: Color(0xFFDFDEE8),
+          fillColor: widget.background,
           filled: true,
           hintText: widget.hintText,
-          hintStyle: TextStyle(color: Colors.black),
+          hintStyle: TextStyle(color: widget.hintTextColor),
           labelText: widget.labelText,
           suffix: widget.suffixIcon,
           prefix: widget.prefixIcon,
           errorText: widget.errorMsg,
-          labelStyle: TextStyle(color: Color(0xFF303F9F)),
+          labelStyle: TextStyle(color: widget.labelTextColor),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Color(0xFFFF9500)),
@@ -64,7 +70,7 @@ class _MyTextFieldState extends State<MyTextField> {
               borderSide: BorderSide(color: Colors.grey)),
           contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         ),
-        style: TextStyle(color: Colors.black, fontSize: 20),
+        style: TextStyle(color: Colors.white, fontSize: 20),
       ),
     );
   }

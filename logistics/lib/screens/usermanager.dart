@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:logistcs/components/admin_dashboard/mygrid.dart';
+import 'package:logistcs/components/mygrid.dart';
 
 class UserManagement extends StatelessWidget {
   const UserManagement({super.key});

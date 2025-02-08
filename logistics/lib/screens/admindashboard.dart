@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:logistcs/components/admin_dashboard/mygrid.dart';
+import 'package:logistcs/components/mygrid.dart';
 import 'package:logistcs/components/drawer/custom_drawer.dart';
-import 'package:logistcs/components/admin_dashboard/priority.dart';
+import 'package:logistcs/components/priority.dart';
 
 class Admindashboard extends StatefulWidget {
   const Admindashboard({super.key});

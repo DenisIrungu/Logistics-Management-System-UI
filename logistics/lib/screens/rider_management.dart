@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:logistcs/components/admin_dashboard/mygrid.dart';
+import 'package:logistcs/components/mygrid.dart';
 import 'package:logistcs/components/mycontainer.dart';
 import 'package:logistcs/components/mytextfield.dart';
 
@@ -118,8 +118,13 @@ class _RiderManagementState extends State<RiderManagement> {
             setState(() {
               _selectedIndex = index;
             });
+            switch (index) {
+              case 0:
+                Navigator.pushNamed(context, '/riderbasicinfor');
+                break;
+            }
           },
-          items: const [
+          items: [
             BottomNavigationBarItem(icon: Icon(Icons.person_add), label: 'ADD'),
             BottomNavigationBarItem(icon: Icon(Icons.update), label: 'UPDATE'),
             BottomNavigationBarItem(icon: Icon(Icons.delete), label: 'DELETE'),
