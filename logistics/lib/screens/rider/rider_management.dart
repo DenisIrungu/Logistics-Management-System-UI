@@ -79,10 +79,20 @@ class _RiderManagementState extends State<RiderManagement> {
                   crossAxisCount: 2,
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
-                  children: const [
-                    MyGrid(title: 'Track', color: Color(0xFF0F0156)),
+                  children: [
+                    //rider tracking
+                    MyGrid(
+                      title: 'Track',
+                      color: Color(0xFF0F0156),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/ridertracking');
+                      },
+                    ),
+                    //Active riders
                     MyGrid(title: 'Active', color: Color(0xFF0F0156)),
+                    //Inactive riders
                     MyGrid(title: 'Inactive', color: Color(0xFF0F0156)),
+                    //FeeedBacks
                     MyGrid(title: 'Feedbacks', color: Color(0xFF0F0156)),
                   ],
                 ),

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:logistcs/appView.dart';
-import 'package:logistcs/screens/add_new_rider/accountsetup.dart';
-import 'package:logistcs/screens/add_new_rider/basic_infor.dart';
-import 'package:logistcs/screens/add_new_rider/bike_information.dart';
-import 'package:logistcs/screens/add_new_rider/documents.dart';
+import 'package:logistcs/screens/rider/add_new_rider/accountsetup.dart';
+import 'package:logistcs/screens/rider/add_new_rider/basic_infor.dart';
+import 'package:logistcs/screens/rider/add_new_rider/bike_information.dart';
+import 'package:logistcs/screens/rider/add_new_rider/documents.dart';
 //import 'package:logistcs/screens/add_new_rider/emergencycontacts.dart';
-import 'package:logistcs/screens/add_new_rider/emergencycontacts.dart';
+import 'package:logistcs/screens/rider/add_new_rider/emergencycontacts.dart';
 
 import 'package:logistcs/screens/admindashboard.dart';
 import 'package:logistcs/screens/onboardingscreen.dart';
-import 'package:logistcs/screens/rider_management.dart';
+import 'package:logistcs/screens/rider/rider_management.dart';
+import 'package:logistcs/screens/rider/tracking/rider_tracking.dart';
 import 'package:logistcs/screens/sign_in_screen.dart';
 import 'package:logistcs/screens/usermanager.dart';
 
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
           '/documentsupload': (context) => DocumentsUpload(),
           '/emergencycontacts': (context) => EmergencyContacts(),
           '/accountsetup': (context)=> AccountSetup(),
+          '/ridertracking': (context)=> RiderTracking(),
         });
   }
 }
