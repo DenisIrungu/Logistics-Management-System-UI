@@ -33,7 +33,7 @@ class _AdmindashboardState extends State<Admindashboard> {
 
     return MediaQuery(
       data: mediaQuery.copyWith(
-        textScaleFactor: textScaleFactor,
+        textScaler: TextScaler.linear(textScaleFactor),
       ),
       child: Scaffold(
         backgroundColor:

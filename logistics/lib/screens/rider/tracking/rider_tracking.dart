@@ -164,6 +164,7 @@ class _RiderTrackingState extends State<RiderTracking> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: Theme.of(context).colorScheme.secondary,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.surface,
@@ -229,7 +230,7 @@ class _RiderTrackingState extends State<RiderTracking> {
                     CheckboxListTile(
                         title: Text('Inactive',
                             style: TextStyle(color: Color(0xFF0F0156))),
-                        value: onTask,
+                        value: inactive,
                         onChanged: (val) => setState(() => inactive = val!)),
                     SizedBox(
                       height: 5,
@@ -357,7 +358,9 @@ class _RiderTrackingState extends State<RiderTracking> {
                   ),
                   child: Center(
                     child: IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          _scaffoldKey.currentState?.openDrawer();
+                        },
                         icon: Icon(Icons.tune),
                         iconSize: 30,
                         color: Colors.black,

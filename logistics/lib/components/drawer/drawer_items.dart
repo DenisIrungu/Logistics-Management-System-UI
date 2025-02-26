@@ -7,7 +7,7 @@ class DrawerItem extends StatelessWidget {
   final VoidCallback? onTap;
 
   const DrawerItem(
-      {required this.icon,
+      {super.key, required this.icon,
       required this.text,
       this.isLogout = false,
       this.onTap});

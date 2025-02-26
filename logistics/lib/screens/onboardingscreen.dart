@@ -37,12 +37,25 @@ class OnBoardingScreen extends StatelessWidget {
               },
               child: MyContainer(text: 'Admin')),
           SizedBox(height: 50),
-          MyContainer(text: 'Rider'),
+          GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, '/signinscreen');
+              },
+              child: MyContainer(text: 'Rider')),
           SizedBox(height: 50),
-          MyContainer(text: 'Agent'),
+          GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, '/signinscreen');
+              },
+              child: MyContainer(text: 'Agent')),
           SizedBox(height: 50),
-          MyContainer(
-            text: ('Customer'),
+          GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(context, '/signinscreen');
+            },
+            child: MyContainer(
+              text: ('Customer'),
+            ),
           )
         ],
       ),

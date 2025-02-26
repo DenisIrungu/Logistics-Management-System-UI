@@ -4,8 +4,7 @@ class PriorityCard extends StatelessWidget {
   final String title;
   final String description;
 
-  const PriorityCard({required this.title, required this.description, Key? key})
-      : super(key: key);
+  const PriorityCard({required this.title, required this.description, super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -116,7 +116,7 @@ class _AccountSetupState extends State<AccountSetup> {
             const SizedBox(height: 20),
             MyButton(
               text: 'Save & Submit',
-              onPress: accepttermsandcondition ? () {} : null ?? () {},
+              onPress: accepttermsandcondition ? () {} : () {},
               color: accepttermsandcondition
                   ? const Color(0xFF0F0156)
                   : Colors.grey,

@@ -11,8 +11,7 @@ class MyGrid extends StatelessWidget {
       required this.title,
       required this.color,
       this.onTap,
-      Key? key})
-      : super(key: key);
+      super.key});
 
   @override
   Widget build(BuildContext context) {

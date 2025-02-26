@@ -6,7 +6,7 @@ class MyContainer extends StatelessWidget {
   final Icon? icon;
   final VoidCallback? onTap;
 
-  MyContainer(
+  const MyContainer(
       {required this.text, this.color, this.icon, this.onTap, super.key});
 
   @override
