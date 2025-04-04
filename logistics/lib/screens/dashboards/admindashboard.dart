@@ -148,6 +148,9 @@ class _AdmindashboardState extends State<Admindashboard> {
                         },
                       ),
                       MyGrid(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/deliveryOverview');
+                        },
                         icon: Icons.local_shipping,
                         title: 'Deliveries',
                         color: const Color(0xFF0F0156),

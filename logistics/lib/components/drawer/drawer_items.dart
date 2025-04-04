@@ -1,3 +1,4 @@
+import 'package:auth_repository/auth_repository.dart';
 import 'package:flutter/material.dart';
 
 class DrawerItem extends StatelessWidget {
@@ -7,7 +8,8 @@ class DrawerItem extends StatelessWidget {
   final VoidCallback? onTap;
 
   const DrawerItem(
-      {super.key, required this.icon,
+      {super.key,
+      required this.icon,
       required this.text,
       this.isLogout = false,
       this.onTap});
@@ -18,6 +20,20 @@ class DrawerItem extends StatelessWidget {
         leading: Icon(icon, color: isLogout ? Color(0xFF0F0156) : Colors.black),
         title: Text(text,
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        onTap: onTap);
+        onTap: onTap ??
+            () async {
+              try {
+                // Call logout from AuthRepository
+                final authRepo = DbAuthRepository();
+                await authRepo.logOut();
+
+                // Navigate to login screen
+                Navigator.pushReplacementNamed(context, '/signinscreen');
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Logout failed: $e')),
+                );
+              }
+            });
   }
 }

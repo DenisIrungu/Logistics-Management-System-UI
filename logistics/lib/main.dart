@@ -7,7 +7,7 @@ import 'app.dart';
 
 void main() async {
   WidgetsFlutterBinding
-      .ensureInitialized(); // Ensures proper async calls before runApp()
+      .ensureInitialized(); 
   final authRepository = DbAuthRepository();
 
   runApp(
@@ -20,7 +20,7 @@ void main() async {
           BlocProvider(
             create: (context) =>
                 AuthenticationBloc(authRepository: authRepository)
-                  ..add(AuthStatusChecked()), // Checks login state on startup
+                  ..add(AuthStatusChecked()), 
           ),
         ],
         child: const MyApp(),
