@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:logistcs/components/mytextfield.dart';
 
 class DeliveredDeliveriesScreen extends StatefulWidget {
+  const DeliveredDeliveriesScreen({super.key});
+
   @override
   State<DeliveredDeliveriesScreen> createState() =>
       _DeliveredDeliveriesScreenState();
 }
 
 class _DeliveredDeliveriesScreenState extends State<DeliveredDeliveriesScreen> {
-  TextEditingController _searchDeliveredDeliveries = TextEditingController();
+  final TextEditingController _searchDeliveredDeliveries = TextEditingController();
   int _selectedItem = 2;
   bool isExpanded = false;
   final List<Map<String, String>> deliveries = [

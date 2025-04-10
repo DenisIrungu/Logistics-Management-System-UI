@@ -35,6 +35,7 @@ class MyApp extends StatelessWidget {
           switch (state.role) {
             case 'admin':
               homeScreen = Admindashboard();
+              print('Navigating to Admindashboard');
               break;
             case 'rider':
               homeScreen = RiderDashboard();

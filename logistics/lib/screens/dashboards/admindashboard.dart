@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logistcs/blocs/admin/admin_bloc.dart';
 import 'package:logistcs/components/mygrid.dart';
 import 'package:logistcs/components/drawer/custom_drawer.dart';
 import 'package:logistcs/components/priority.dart';
+import 'package:admin_repository/admin_repository.dart';
 
 class Admindashboard extends StatefulWidget {
   const Admindashboard({super.key});
@@ -11,20 +14,31 @@ class Admindashboard extends StatefulWidget {
 }
 
 class _AdmindashboardState extends State<Admindashboard> {
-  final List<Map<String, String>> priorities = [
-    {
-      'title': 'Delivery Delay in Nairobi',
-      'description': '20 packages delayed due to weather'
-    },
-    {
-      'title': 'System Update Required',
-      'description': 'New security patch available'
-    },
-    {
-      'title': 'Pending Approvals',
-      'description': '5 requests need your attention'
-    },
-  ];
+  bool _hasFetchedData = false;
+
+  // Function to determine the greeting based on the time of day
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour >= 5 && hour < 12) {
+      return 'Good Morning';
+    } else if (hour >= 12 && hour < 17) {
+      return 'Good Afternoon';
+    } else {
+      return 'Good Evening';
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (!_hasFetchedData) {
+      print('Admindashboard: Triggering data fetch events');
+      context.read<AdminBloc>().add(FetchAdminProfile());
+      context.read<AdminBloc>().add(FetchPriorities());
+      context.read<AdminBloc>().add(FetchNotificationsCount());
+      _hasFetchedData = true;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,14 +66,51 @@ class _AdmindashboardState extends State<Admindashboard> {
           ),
           centerTitle: true,
           elevation: 0,
-          actions: const [
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Icon(
-                Icons.notifications,
-                color: Colors.white,
-                size: 24,
-              ),
+          actions: [
+            BlocBuilder<AdminBloc, AdminBlocState>(
+              builder: (context, state) {
+                return Stack(
+                  children: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.notifications,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                      onPressed: () {
+                        // Handle notifications tap (to be implemented)
+                      },
+                    ),
+                    if (state.notificationsState is NotificationsSuccess &&
+                        (state.notificationsState as NotificationsSuccess)
+                                .count >
+                            0)
+                      Positioned(
+                        right: 8,
+                        top: 8,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 16,
+                            minHeight: 16,
+                          ),
+                          child: Text(
+                            '${(state.notificationsState as NotificationsSuccess).count}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
             ),
           ],
         ),
@@ -72,16 +123,61 @@ class _AdmindashboardState extends State<Admindashboard> {
               children: [
                 Align(
                   alignment: Alignment.center,
-                  child: Text(
-                    'Good Morning, Denis',
-                    style: TextStyle(
-                      color: const Color(0xFF0F0156),
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      height: 1.2,
-                    ).copyWith(
-                      letterSpacing: 0.5,
-                    ),
+                  child: BlocBuilder<AdminBloc, AdminBlocState>(
+                    builder: (context, state) {
+                      final greeting =
+                          _getGreeting(); // Use the dynamic greeting
+                      if (state.profileState is ProfileLoading) {
+                        return Text(
+                          '$greeting, Loading...',
+                          style: TextStyle(
+                            color: const Color(0xFF0F0156),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            height: 1.2,
+                          ).copyWith(
+                            letterSpacing: 0.5,
+                          ),
+                        );
+                      } else if (state.profileState is ProfileSuccess) {
+                        final profile =
+                            (state.profileState as ProfileSuccess).adminProfile;
+                        return Text(
+                          '$greeting, ${profile.name}',
+                          style: TextStyle(
+                            color: const Color(0xFF0F0156),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            height: 1.2,
+                          ).copyWith(
+                            letterSpacing: 0.5,
+                          ),
+                        );
+                      } else if (state.profileState is ProfileFailure) {
+                        return Text(
+                          '$greeting, Admin (Error)',
+                          style: TextStyle(
+                            color: const Color(0xFF0F0156),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            height: 1.2,
+                          ).copyWith(
+                            letterSpacing: 0.5,
+                          ),
+                        );
+                      }
+                      return Text(
+                        '$greeting, Admin',
+                        style: TextStyle(
+                          color: const Color(0xFF0F0156),
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          height: 1.2,
+                        ).copyWith(
+                          letterSpacing: 0.5,
+                        ),
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -90,7 +186,7 @@ class _AdmindashboardState extends State<Admindashboard> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
+                    boxShadow: const [
                       BoxShadow(
                         color: Colors.black12,
                         blurRadius: 4,
@@ -101,7 +197,7 @@ class _AdmindashboardState extends State<Admindashboard> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Priorities',
                         style: TextStyle(
                           color: Color(0xFF0F0156),
@@ -109,24 +205,59 @@ class _AdmindashboardState extends State<Admindashboard> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 8),
-                      SizedBox(
-                        height: 120, // Ensures scrolling stays inside the box
-                        child: ListView.builder(
-                          physics: BouncingScrollPhysics(),
-                          scrollDirection: Axis.horizontal,
-                          itemCount: priorities.length,
-                          padding: EdgeInsets.symmetric(vertical: 8),
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 12.0),
-                              child: PriorityCard(
-                                title: priorities[index]['title']!,
-                                description: priorities[index]['description']!,
+                      const SizedBox(height: 8),
+                      BlocBuilder<AdminBloc, AdminBlocState>(
+                        builder: (context, state) {
+                          if (state.prioritiesState is PrioritiesLoading) {
+                            return const SizedBox(
+                              height: 120,
+                              child: Center(child: CircularProgressIndicator()),
+                            );
+                          } else if (state.prioritiesState
+                              is PrioritiesSuccess) {
+                            final priorities =
+                                (state.prioritiesState as PrioritiesSuccess)
+                                    .priorities;
+                            if (priorities.isEmpty) {
+                              return const SizedBox(
+                                height: 120,
+                                child:
+                                    Center(child: Text('No priorities found')),
+                              );
+                            }
+                            return SizedBox(
+                              height: 120,
+                              child: ListView.builder(
+                                physics: const BouncingScrollPhysics(),
+                                scrollDirection: Axis.horizontal,
+                                itemCount: priorities.length,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                                itemBuilder: (context, index) {
+                                  final issue = priorities[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 12.0),
+                                    child: PriorityCard(
+                                      title: issue.title,
+                                      description: issue.description,
+                                    ),
+                                  );
+                                },
                               ),
                             );
-                          },
-                        ),
+                          } else if (state.prioritiesState
+                              is PrioritiesFailure) {
+                            return const SizedBox(
+                              height: 120,
+                              child: Center(
+                                  child: Text('Error loading priorities')),
+                            );
+                          }
+                          return const SizedBox(
+                            height: 120,
+                            child: Center(child: Text('No priorities found')),
+                          );
+                        },
                       ),
                     ],
                   ),

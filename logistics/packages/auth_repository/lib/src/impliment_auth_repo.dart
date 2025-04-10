@@ -1,27 +1,31 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:auth_repository/src/abstract_auth_repo.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:logistcs/services/api_client.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DbAuthRepository implements AuthRepository {
-  final String baseUrl = 'http://10.0.2.2:8000';
+  final ApiClient _apiClient;
+
+  DbAuthRepository({ApiClient? apiClient}) : _apiClient = apiClient ?? ApiClient();
 
   @override
   Future<void> logIn(String email, String password) async {
     try {
-      final response = await ApiClient().post(
+      print('DbAuthRepository: Login started for email: $email');
+      final response = await _apiClient.post(
         '/auth/login',
         {'email': email, 'password': password},
       );
 
-      print('Login response status: ${response.statusCode}');
-      print('Login response body: ${response.body}');
-      print('Login response headers: ${response.headers}');
+      print('DbAuthRepository: Login response status: ${response.statusCode}');
+      print('DbAuthRepository: Login response body: ${response.body}');
+      print('DbAuthRepository: Login response headers: ${response.headers}');
 
       if (response.statusCode == 200) {
         // Extract session cookie from response headers
         final cookies = response.headers['set-cookie'];
+        print('DbAuthRepository: Cookies from response: $cookies');
         if (cookies == null) {
           throw Exception('Set-Cookie header not found in response');
         }
@@ -30,30 +34,34 @@ class DbAuthRepository implements AuthRepository {
           (cookie) => cookie.trim().startsWith('session='),
           orElse: () => '',
         );
+        print('DbAuthRepository: Extracted session cookie: $sessionCookie');
         if (sessionCookie.isEmpty) {
           throw Exception('Session cookie not found in response');
         }
 
         // Extract role from the session cookie (format: session={user_id}|{role})
         final sessionValue = sessionCookie.split('=')[1]; // e.g., "5|admin"
+        print('DbAuthRepository: Session value: $sessionValue');
         final role = sessionValue.split('|')[1]; // e.g., "admin"
+        print('DbAuthRepository: Extracted role: $role');
         if (role.isEmpty) {
           throw Exception('Role not found in session cookie');
         }
 
         // Store the session cookie in ApiClient for future requests
-        ApiClient().setSessionCookie(sessionCookie);
+        await _apiClient.setSessionCookie(sessionCookie);
 
         // Store the role and login status in SharedPreferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('user_role', role);
         await prefs.setBool('is_logged_in', true);
+        print('DbAuthRepository: Login successful! Role: $role');
       } else {
         final data = jsonDecode(response.body);
         throw Exception(data['message'] as String? ?? 'Login failed');
       }
     } catch (e) {
-      print("Login error: ${e.toString()}");
+      print("DbAuthRepository: Login error: ${e.toString()}");
       rethrow;
     }
   }
@@ -78,9 +86,10 @@ class DbAuthRepository implements AuthRepository {
       await prefs.clear();
 
       // Clear session cookie from ApiClient
-      ApiClient().clearSessionCookie();
+      await _apiClient.clearSessionCookie();
+      print('DbAuthRepository: Logged out');
     } catch (e) {
-      print("Logout error: ${e.toString()}");
+      print("DbAuthRepository: Logout error: ${e.toString()}");
       rethrow;
     }
   }
@@ -89,7 +98,7 @@ class DbAuthRepository implements AuthRepository {
   Future<void> forgotPassword({required String email}) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/forgot-password'),
+        Uri.parse('http://10.0.2.2:8000/forgot-password'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email}),
       );
