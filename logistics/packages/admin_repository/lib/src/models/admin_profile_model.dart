@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:admin_repository/src/entities/entities_admin_profile.dart'; // Add this import
 
 class AdminProfileModel extends Equatable {
   final String name;
@@ -25,6 +26,15 @@ class AdminProfileModel extends Equatable {
       'email': email,
       'profile_picture': profilePicture,
     };
+  }
+
+  // Add toEntity method to convert model to entity
+  AdminProfile toEntity() {
+    return AdminProfile(
+      name: name,
+      email: email,
+      profilePicture: profilePicture,
+    );
   }
 
   @override

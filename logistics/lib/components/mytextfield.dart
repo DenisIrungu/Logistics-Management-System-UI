@@ -16,6 +16,7 @@ class MyTextField extends StatefulWidget {
   final FocusNode? focusNode;
   final String? errorMsg;
   final String? Function(String?)? onChanged;
+  final int? maxlength;
 
   String? errorText;
 
@@ -35,6 +36,7 @@ class MyTextField extends StatefulWidget {
       this.focusNode,
       this.errorMsg,
       this.onChanged,
+      this.maxlength,
       super.key});
 
   @override
@@ -47,6 +49,7 @@ class _MyTextFieldState extends State<MyTextField> {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: TextFormField(
+        maxLength: widget.maxlength,
         validator: widget.validator,
         obscureText: widget.obscureText,
         controller: widget.controller,
@@ -70,7 +73,7 @@ class _MyTextFieldState extends State<MyTextField> {
               borderSide: BorderSide(color: Colors.grey)),
           contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         ),
-        style: TextStyle(color: Colors.white, fontSize: 20),
+        style: TextStyle(color: Color(0xFF0F0156), fontSize: 20),
       ),
     );
   }

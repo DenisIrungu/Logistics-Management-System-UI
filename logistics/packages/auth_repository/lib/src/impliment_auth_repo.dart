@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:auth_repository/src/abstract_auth_repo.dart';
 import 'package:logistcs/services/api_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,7 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class DbAuthRepository implements AuthRepository {
   final ApiClient _apiClient;
 
-  DbAuthRepository({ApiClient? apiClient}) : _apiClient = apiClient ?? ApiClient();
+  DbAuthRepository({ApiClient? apiClient})
+      : _apiClient = apiClient ?? ApiClient();
 
   @override
   Future<void> logIn(String email, String password) async {
@@ -15,7 +15,10 @@ class DbAuthRepository implements AuthRepository {
       print('DbAuthRepository: Login started for email: $email');
       final response = await _apiClient.post(
         '/auth/login',
-        {'email': email, 'password': password},
+        body: {
+          'email': email,
+          'password': password
+        }, // Use named parameter 'body'
       );
 
       print('DbAuthRepository: Login response status: ${response.statusCode}');
@@ -31,9 +34,9 @@ class DbAuthRepository implements AuthRepository {
         }
 
         final sessionCookie = cookies.split(';').firstWhere(
-          (cookie) => cookie.trim().startsWith('session='),
-          orElse: () => '',
-        );
+              (cookie) => cookie.trim().startsWith('session='),
+              orElse: () => '',
+            );
         print('DbAuthRepository: Extracted session cookie: $sessionCookie');
         if (sessionCookie.isEmpty) {
           throw Exception('Session cookie not found in response');
@@ -97,18 +100,24 @@ class DbAuthRepository implements AuthRepository {
   @override
   Future<void> forgotPassword({required String email}) async {
     try {
-      final response = await http.post(
-        Uri.parse('http://10.0.2.2:8000/forgot-password'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email}),
+      print('DbAuthRepository: Forgot password started for email: $email');
+      final response = await _apiClient.post(
+        '/forgot-password',
+        body: {'email': email}, // Use named parameter 'body'
       );
 
-      final data = jsonDecode(response.body);
+      print(
+          'DbAuthRepository: Forgot password response status: ${response.statusCode}');
+      print(
+          'DbAuthRepository: Forgot password response body: ${response.body}');
+
       if (response.statusCode != 200) {
-        throw Exception(data['message'] as String? ?? 'Failed to reset password');
+        final data = jsonDecode(response.body);
+        throw Exception(
+            data['message'] as String? ?? 'Failed to reset password');
       }
     } catch (e) {
-      print("Forgot password error: ${e.toString()}");
+      print("DbAuthRepository: Forgot password error: ${e.toString()}");
       rethrow;
     }
   }

@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logistcs/appView.dart';
+import 'package:logistcs/blocs/admin/theme_bloc.dart';
 import 'package:logistcs/blocs/authorization/authentication_bloc.dart';
+import 'package:logistcs/screens/admindashboarddrawer/feedbacks.dart';
+import 'package:logistcs/screens/admindashboarddrawer/preferences.dart';
+import 'package:logistcs/screens/admindashboarddrawer/profilescreen.dart';
+import 'package:logistcs/screens/admindashboarddrawer/top_5_regions.dart';
 import 'package:logistcs/screens/dashboards/admindashboard.dart';
 import 'package:logistcs/screens/dashboards/agentdashboard.dart';
 import 'package:logistcs/screens/dashboards/customerdashboard.dart';
@@ -26,70 +31,67 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
-      builder: (context, state) {
-        Widget homeScreen;
+    return BlocBuilder<ThemeBloc, ThemeState>(
+      builder: (context, themeState) {
+        return BlocBuilder<AuthenticationBloc, AuthenticationState>(
+          builder: (context, state) {
+            Widget homeScreen;
 
-        if (state.status == AuthenticationStatus.authenticated) {
-          // Navigate based on user role
-          switch (state.role) {
-            case 'admin':
-              homeScreen = Admindashboard();
-              print('Navigating to Admindashboard');
-              break;
-            case 'rider':
-              homeScreen = RiderDashboard();
-              break;
-            case 'agent':
-              homeScreen = AgentDashboard();
-              break;
-            case 'customer':
-              homeScreen = CustomerDashboard();
-              break;
-            default:
-              homeScreen = SignInScreen();
-          }
-        } else if (state.status == AuthenticationStatus.loading) {
-          homeScreen = const Center(child: CircularProgressIndicator());
-        } else {
-          homeScreen = AppView();
-        }
+            if (state.status == AuthenticationStatus.authenticated) {
+              // Navigate based on user role
+              switch (state.role) {
+                case 'admin':
+                  homeScreen = Admindashboard();
+                  print('Navigating to Admindashboard');
+                  break;
+                case 'rider':
+                  homeScreen = RiderDashboard();
+                  break;
+                case 'agent':
+                  homeScreen = AgentDashboard();
+                  break;
+                case 'customer':
+                  homeScreen = CustomerDashboard();
+                  break;
+                default:
+                  homeScreen = SignInScreen();
+              }
+            } else if (state.status == AuthenticationStatus.loading) {
+              homeScreen = const Center(child: CircularProgressIndicator());
+            } else {
+              homeScreen = AppView();
+            }
 
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Dropu Logistics',
-          theme: ThemeData(
-            colorScheme: ColorScheme.light(
-              primary: const Color(0xFFFFFFFF),
-              onPrimary: const Color(0xFFFF9500),
-              secondary: const Color(0xFFD9D9D8),
-              onSecondary: Colors.black,
-              error: Colors.red,
-              onError: Colors.green,
-              surface: const Color(0xFF0F0156),
-              onSurface: Colors.white,
-            ),
-          ),
-          home: homeScreen,
-          routes: {
-            '/onboardingscreen': (context) => const OnBoardingScreen(),
-            '/ridermanagement': (context) => const RiderManagement(),
-            '/ridertracking': (context) => const RiderTracking(),
-            '/riderbasicinfor': (context) => const RiderBasicInfor(),
-            '/riderbikeinfor': (context) => const RiderBikeInfor(),
-            '/documentsupload': (context) => DocumentsUpload(),
-            '/emergencycontacts': (context) => EmergencyContacts(),
-            '/usermanagement': (context) => UserManagement(),
-            '/accountsetup': (context) => AccountSetup(),
-            '/signinscreen': (context) => const SignInScreen(),
-            '/adminDashboard': (context) => Admindashboard(),
-            '/riderDashboard': (context) => RiderDashboard(),
-            '/agentDashboard': (context) => AgentDashboard(),
-            '/customerDashboard': (context) => CustomerDashboard(),
-            '/deliveryOverview': (context) => DeliveriesOverview(),
-            '/pendingDeliveries': (context) => PendingDeliveries(),
-            '/assignedDeliveries': (context) => AssignedDeliveries(),
-            'delivereddeliveries': (context) => DeliveredDeliveriesScreen()
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: 'Dropu Logistics',
+              theme: themeState.themeData, // Use dynamic theme from ThemeBloc
+              home: homeScreen,
+              routes: {
+                '/onboardingscreen': (context) => const OnBoardingScreen(),
+                '/ridermanagement': (context) => const RiderManagement(),
+                '/ridertracking': (context) => const RiderTracking(),
+                '/riderbasicinfor': (context) => const RiderBasicInfor(),
+                '/riderbikeinfor': (context) => const RiderBikeInfor(),
+                '/documentsupload': (context) => DocumentsUpload(),
+                '/emergencycontacts': (context) => EmergencyContacts(),
+                '/usermanagement': (context) => UserManagement(),
+                '/accountsetup': (context) => AccountSetup(),
+                '/signinscreen': (context) => const SignInScreen(),
+                '/adminDashboard': (context) => Admindashboard(),
+                '/riderDashboard': (context) => RiderDashboard(),
+                '/agentDashboard': (context) => AgentDashboard(),
+                '/customerDashboard': (context) => CustomerDashboard(),
+                '/deliveryOverview': (context) => DeliveriesOverview(),
+                '/pendingDeliveries': (context) => PendingDeliveries(),
+                '/assignedDeliveries': (context) => AssignedDeliveries(),
+                'delivereddeliveries': (context) => DeliveredDeliveriesScreen(),
+                '/profilescreen': (context) => ProfileScreen(),
+                '/preferencescreen': (context) =>  PreferencesScreen(),
+                '/top5bestregions': (context)=> Top5Regions(),
+                '/feedbacks': (context)=> FeedBacks()
+              },
+            );
           },
         );
       },

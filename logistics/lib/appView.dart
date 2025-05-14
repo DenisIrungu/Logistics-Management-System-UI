@@ -8,6 +8,7 @@ import 'package:logistcs/screens/dashboards/riderdashboard.dart';
 import 'package:logistcs/screens/onboardingscreen.dart';
 import 'package:logistcs/screens/splashscreen.dart';
 
+
 class AppView extends StatelessWidget {
   const AppView({super.key});
 

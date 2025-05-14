@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logistcs/blocs/admin/admin_bloc.dart';
+import 'package:logistcs/blocs/admin/admin_event.dart';
+import 'package:logistcs/blocs/admin/admin_state.dart';
 import 'package:logistcs/components/mygrid.dart';
 import 'package:logistcs/components/drawer/custom_drawer.dart';
 import 'package:logistcs/components/priority.dart';
@@ -53,6 +55,7 @@ class _AdmindashboardState extends State<Admindashboard> {
         backgroundColor:
             Theme.of(context).colorScheme.secondary.withOpacity(1.0),
         appBar: AppBar(
+          iconTheme: IconThemeData(color: Colors.white),
           backgroundColor:
               Theme.of(context).colorScheme.surface.withOpacity(1.0),
           title: const Text(
