@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:admin_repository/admin_repository.dart';
 import 'package:logistcs/blocs/admin/theme_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'admin_event.dart';
 import 'admin_state.dart';
 
@@ -23,41 +24,43 @@ class AdminBloc extends Bloc<AdminEvent, AdminBlocState> {
     on<FetchAdminPreferences>(_onFetchAdminPreferences);
     on<UpdateAdminPreferences>(_onUpdateAdminPreferences);
     on<FetchTopRegions>(_onFetchTopRegions);
-    on<FetchFeedbacks>(_onFetchFeedbacks); // Add this
+    on<FetchFeedbacks>(_onFetchFeedbacks);
+    on<RegisterRider>(_onRegisterRider);
+    on<ResendRiderEmail>(_onResendRiderEmail);
   }
 
   Future<void> _onFetchAdminProfile(
-  FetchAdminProfile event,
-  Emitter<AdminBlocState> emit,
-) async {
-  print('AdminBloc: FetchAdminProfile event triggered');
-  if (_cachedProfile != null && state.profileState is! ProfileFailure) {
-    print('AdminBloc: Using cached profile data');
-    emit(state.copyWith(
-      profileState: ProfileSuccess(_cachedProfile!),
-      updateState: const UpdateInitial(),  // Fix: Use UpdateInitial instead of null
-    ));
-    return;
-  }
+    FetchAdminProfile event,
+    Emitter<AdminBlocState> emit,
+  ) async {
+    print('AdminBloc: FetchAdminProfile event triggered');
+    if (_cachedProfile != null && state.profileState is! ProfileFailure) {
+      print('AdminBloc: Using cached profile data');
+      emit(state.copyWith(
+        profileState: ProfileSuccess(_cachedProfile!),
+        updateState: const UpdateInitial(),
+      ));
+      return;
+    }
 
-  emit(state.copyWith(profileState: const ProfileLoading()));
-  try {
-    final adminProfile = await adminRepository.fetchAdminProfile();
-    _cachedProfile = adminProfile;
-    print(
-        'AdminBloc: Profile fetched successfully: ${adminProfile.name}, ${adminProfile.email}');
-    emit(state.copyWith(
-      profileState: ProfileSuccess(adminProfile),
-      updateState: const UpdateInitial(),  // Fix: Use UpdateInitial instead of null
-    ));
-  } catch (e) {
-    print('AdminBloc: Error fetching profile: $e');
-    emit(state.copyWith(
-      profileState: ProfileFailure(e.toString()),
-      updateState: const UpdateInitial(),  // Fix: Use UpdateInitial instead of null
-    ));
+    emit(state.copyWith(profileState: const ProfileLoading()));
+    try {
+      final adminProfile = await adminRepository.fetchAdminProfile();
+      _cachedProfile = adminProfile;
+      print(
+          'AdminBloc: Profile fetched successfully: ${adminProfile.name}, ${adminProfile.email}');
+      emit(state.copyWith(
+        profileState: ProfileSuccess(adminProfile),
+        updateState: const UpdateInitial(),
+      ));
+    } catch (e) {
+      print('AdminBloc: Error fetching profile: $e');
+      emit(state.copyWith(
+        profileState: ProfileFailure(e.toString()),
+        updateState: const UpdateInitial(),
+      ));
+    }
   }
-}
 
   Future<void> _onFetchPriorities(
     FetchPriorities event,
@@ -211,6 +214,81 @@ class AdminBloc extends Bloc<AdminEvent, AdminBlocState> {
       emit(state.copyWith(feedbackState: FeedbackSuccess(feedbacks)));
     } catch (e) {
       emit(state.copyWith(feedbackState: FeedbackFailure(e.toString())));
+    }
+  }
+
+  Future<void> _onRegisterRider(
+    RegisterRider event,
+    Emitter<AdminBlocState> emit,
+  ) async {
+    print(
+        'AdminBloc: Handling RegisterRider event with data: ${event.riderData}');
+    // Validate inputs
+    final email = event.riderData['email'] as String?;
+    final termsAcceptedStr = event.riderData['terms_accepted'] as String?;
+    final termsAccepted = termsAcceptedStr?.toLowerCase() == 'true';
+
+    if (email == null || email.isEmpty) {
+      print('AdminBloc: Validation failed - Email is required');
+      emit(state.copyWith(
+        riderRegistrationState: RiderRegistrationFailure(
+          'Email is required',
+        ),
+      ));
+      return;
+    }
+    if (termsAccepted != true) {
+      print('AdminBloc: Validation failed - Terms not accepted');
+      emit(state.copyWith(
+        riderRegistrationState: RiderRegistrationFailure(
+          'Please accept the terms and conditions',
+        ),
+      ));
+      return;
+    }
+
+    // Emit loading state
+    emit(state.copyWith(
+        riderRegistrationState: const RiderRegistrationLoading()));
+    print('AdminBloc: Emitting RiderRegistrationLoading');
+
+    try {
+      print('AdminBloc: Calling registerRider with data: ${event.riderData}');
+      // Call repository method (cookie handled in repository)
+      await adminRepository.registerRider(
+        riderData: event.riderData,
+      );
+      print('AdminBloc: registerRider call completed successfully');
+
+      // Emit success state
+      emit(state.copyWith(
+          riderRegistrationState: const RiderRegistrationSuccess()));
+      print('AdminBloc: Emitting RiderRegistrationSuccess');
+    } catch (e) {
+      print('AdminBloc: Error during registration: $e');
+      emit(state.copyWith(
+        riderRegistrationState: RiderRegistrationFailure(e.toString()),
+      ));
+      print('AdminBloc: Emitting RiderRegistrationFailure: $e');
+    }
+  }
+
+  Future<void> _onResendRiderEmail(
+    ResendRiderEmail event,
+    Emitter<AdminBlocState> emit,
+  ) async {
+    print('AdminBloc: Handling ResendRiderEmail event for email: ${event.email}');
+    emit(state.copyWith(riderRegistrationState: const RiderRegistrationLoading()));
+    try {
+      await adminRepository.resendVerificationEmail(event.email);
+      emit(state.copyWith(
+        riderRegistrationState: const RiderRegistrationSuccess(),
+      ));
+    } catch (e) {
+      print('AdminBloc: Error during resend email: $e');
+      emit(state.copyWith(
+        riderRegistrationState: RiderRegistrationFailure(e.toString()),
+      ));
     }
   }
 }

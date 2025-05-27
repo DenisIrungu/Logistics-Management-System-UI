@@ -7,9 +7,21 @@ import 'package:logistcs/blocs/admin/admin_event.dart';
 import 'package:logistcs/blocs/admin/theme_bloc.dart';
 import 'package:logistcs/blocs/authorization/authentication_bloc.dart';
 import 'package:logistcs/app.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  final storedSession = prefs.getString('session');
+  print('Initial session from SharedPreferences: $storedSession');
+  if (storedSession == null) {
+    print(
+        'No session found, consider implementing login flow or setting a default for testing');
+    // Optional: Set a default session for testing (remove in production)
+    await prefs.setString('session', '6|admin');
+    print('Default session set for testing: 6|admin');
+  }
+
   final authRepository = DbAuthRepository();
   final adminRepository = DbAdminRepository();
 

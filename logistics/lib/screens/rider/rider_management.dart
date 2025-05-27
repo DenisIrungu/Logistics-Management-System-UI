@@ -21,7 +21,11 @@ class _RiderManagementState extends State<RiderManagement> {
         backgroundColor: Theme.of(context).colorScheme.secondary,
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.surface,
-          title: const Text('Rider Management'),
+          iconTheme: IconThemeData(color: Colors.white),
+          title: const Text(
+            'Rider Management',
+            style: TextStyle(color: Colors.white),
+          ),
           elevation: 0,
           centerTitle: true,
           actions: const [

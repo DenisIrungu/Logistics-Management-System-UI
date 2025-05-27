@@ -9,8 +9,12 @@ class UserManagement extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.secondary,
       appBar: AppBar(
+        iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: Theme.of(context).colorScheme.surface,
-        title: const Text('User Management'),
+        title: const Text(
+          'User Management',
+          style: TextStyle(color: Colors.white),
+        ),
         elevation: 0,
         centerTitle: true,
       ),

@@ -73,7 +73,7 @@ class _MyTextFieldState extends State<MyTextField> {
               borderSide: BorderSide(color: Colors.grey)),
           contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         ),
-        style: TextStyle(color: Color(0xFF0F0156), fontSize: 20),
+        style: TextStyle(color: Colors.white, fontSize: 20),
       ),
     );
   }

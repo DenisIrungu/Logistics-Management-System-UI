@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logistcs/services/api_client.dart';
 
 class RiderDashboard extends StatelessWidget {
   const RiderDashboard({super.key});
@@ -8,6 +9,16 @@ class RiderDashboard extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onSurface,
       appBar: AppBar(
+        iconTheme: IconThemeData(color: Colors.white),
+        actions: [
+          IconButton(
+              onPressed: () async {
+                await ApiClient().clearSessionCookie();
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/signinscreen');
+              },
+              icon: Icon(Icons.logout))
+        ],
         backgroundColor: Theme.of(context).colorScheme.surface,
         centerTitle: true,
         title: Text(

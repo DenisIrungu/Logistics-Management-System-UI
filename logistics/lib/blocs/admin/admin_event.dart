@@ -75,3 +75,23 @@ class FetchFeedbacks extends AdminEvent {
   @override
   List<Object?> get props => [region, dateStart, dateEnd, sortBy, sortOrder];
 }
+
+class RegisterRider extends AdminEvent {
+  final Map<String, dynamic> riderData;
+
+  const RegisterRider({
+    required this.riderData,
+  });
+
+  @override
+  List<Object?> get props => [riderData];
+}
+
+class ResendRiderEmail extends AdminEvent {
+  final String email;
+
+  const ResendRiderEmail({required this.email});
+
+  @override
+  List<Object?> get props => [email];
+}

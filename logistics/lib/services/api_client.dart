@@ -61,29 +61,41 @@ class ApiClient {
     }
   }
 
-  // Updated POST request to use named parameters for body and queryParams
+  // Updated POST request to support form-data or JSON
   Future<http.Response> post(
     String endpoint, {
     Map<String, dynamic>? body,
     Map<String, String>? queryParams,
+    bool useFormData = false, // New parameter to switch between JSON and form-data
   }) async {
-    // Build the URL with query parameters if provided
     final uri = Uri.parse('$baseUrl$endpoint').replace(
       queryParameters: queryParams,
     );
 
-    print('ApiClient: Making POST request to $uri with body: $body');
+    print('ApiClient: Making POST request to $uri with body: $body, useFormData: $useFormData');
     print('ApiClient: Headers: {'
-        'Content-Type: application/json, '
         'Cookie: ${sessionCookie ?? 'none'}}');
-    final response = await http.post(
-      uri,
-      headers: {
-        'Content-Type': 'application/json',
-        if (sessionCookie != null) 'Cookie': sessionCookie!,
-      },
-      body: body != null ? jsonEncode(body) : null,
-    );
+
+    http.Response response;
+    if (useFormData && body != null) {
+      final request = http.MultipartRequest('POST', uri)
+        ..fields.addAll(body.map((key, value) => MapEntry(key, value.toString())))
+        ..headers.addAll({
+          if (sessionCookie != null) 'Cookie': sessionCookie!,
+        });
+      final streamedResponse = await request.send();
+      response = await http.Response.fromStream(streamedResponse);
+    } else {
+      response = await http.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          if (sessionCookie != null) 'Cookie': sessionCookie!,
+        },
+        body: body != null ? jsonEncode(body) : null,
+      );
+    }
+
     print(
         'ApiClient: POST response status: ${response.statusCode}, body: ${response.body}, headers: ${response.headers}');
     return response;

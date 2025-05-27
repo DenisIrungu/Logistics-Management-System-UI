@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:admin_repository/src/models/region_model.dart';
 import 'package:admin_repository/src/entities/entities_admin_profile.dart';
 import 'package:admin_repository/src/entities/entities_issue.dart';
-import 'package:admin_repository/src/models/feedback_model.dart'; // Add this import
+import 'package:admin_repository/src/models/feedback_model.dart';
 
 class AdminBlocState extends Equatable {
   final ProfileState profileState;
@@ -11,7 +11,8 @@ class AdminBlocState extends Equatable {
   final UpdateState updateState;
   final PreferencesState preferencesState;
   final TopRegionsState topRegionsState;
-  final FeedbackState feedbackState; // Already non-nullable
+  final FeedbackState feedbackState;
+  final RiderRegistrationState riderRegistrationState;
 
   const AdminBlocState({
     this.profileState = const ProfileLoading(),
@@ -21,6 +22,7 @@ class AdminBlocState extends Equatable {
     this.preferencesState = const PreferencesLoading(),
     this.topRegionsState = const TopRegionsInitial(),
     this.feedbackState = const FeedbackLoading(),
+    this.riderRegistrationState = const RiderRegistrationInitial(),
   });
 
   AdminBlocState copyWith({
@@ -31,6 +33,7 @@ class AdminBlocState extends Equatable {
     PreferencesState? preferencesState,
     TopRegionsState? topRegionsState,
     FeedbackState? feedbackState,
+    RiderRegistrationState? riderRegistrationState,
   }) {
     return AdminBlocState(
       profileState: profileState ?? this.profileState,
@@ -40,12 +43,12 @@ class AdminBlocState extends Equatable {
       preferencesState: preferencesState ?? this.preferencesState,
       topRegionsState: topRegionsState ?? this.topRegionsState,
       feedbackState: feedbackState ?? this.feedbackState,
+      riderRegistrationState: riderRegistrationState ?? this.riderRegistrationState,
     );
   }
 
   @override
   List<Object> get props => [
-        // Remove nullable Object? to enforce non-null
         profileState,
         prioritiesState,
         notificationsState,
@@ -53,6 +56,7 @@ class AdminBlocState extends Equatable {
         preferencesState,
         topRegionsState,
         feedbackState,
+        riderRegistrationState,
       ];
 }
 
@@ -268,6 +272,35 @@ class FeedbackFailure extends FeedbackState {
   final String error;
 
   const FeedbackFailure(this.error);
+
+  @override
+  List<Object?> get props => [error];
+}
+
+// Rider Registration States
+abstract class RiderRegistrationState extends Equatable {
+  const RiderRegistrationState();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class RiderRegistrationInitial extends RiderRegistrationState {
+  const RiderRegistrationInitial();
+}
+
+class RiderRegistrationLoading extends RiderRegistrationState {
+  const RiderRegistrationLoading();
+}
+
+class RiderRegistrationSuccess extends RiderRegistrationState {
+  const RiderRegistrationSuccess();
+}
+
+class RiderRegistrationFailure extends RiderRegistrationState {
+  final String error;
+
+  const RiderRegistrationFailure(this.error);
 
   @override
   List<Object?> get props => [error];

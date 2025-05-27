@@ -15,10 +15,7 @@ class DbAuthRepository implements AuthRepository {
       print('DbAuthRepository: Login started for email: $email');
       final response = await _apiClient.post(
         '/auth/login',
-        body: {
-          'email': email,
-          'password': password
-        }, // Use named parameter 'body'
+        body: {'email': email, 'password': password},
       );
 
       print('DbAuthRepository: Login response status: ${response.statusCode}');
@@ -42,7 +39,7 @@ class DbAuthRepository implements AuthRepository {
           throw Exception('Session cookie not found in response');
         }
 
-        // Extract role from the session cookie (format: session={user_id}|{role})
+        // Extract session value and role
         final sessionValue = sessionCookie.split('=')[1]; // e.g., "5|admin"
         print('DbAuthRepository: Session value: $sessionValue');
         final role = sessionValue.split('|')[1]; // e.g., "admin"
@@ -51,14 +48,20 @@ class DbAuthRepository implements AuthRepository {
           throw Exception('Role not found in session cookie');
         }
 
-        // Store the session cookie in ApiClient for future requests
-        await _apiClient.setSessionCookie(sessionCookie);
-
-        // Store the role and login status in SharedPreferences
+        // Store the session value (not the full cookie) and role in SharedPreferences
         final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('session', sessionValue); // Store "6|admin"
         await prefs.setString('user_role', role);
         await prefs.setBool('is_logged_in', true);
-        print('DbAuthRepository: Login successful! Role: $role');
+        print(
+            'DbAuthRepository: Stored session in SharedPreferences: $sessionValue');
+        final storedSession = prefs.getString('session');
+        print('DbAuthRepository: Verified stored session: $storedSession');
+
+        // Store the session cookie in ApiClient for future requests
+        await _apiClient.setSessionCookie(sessionCookie);
+        print(
+            'DbAuthRepository: Login successful! Session: $sessionCookie, Role: $role');
       } else {
         final data = jsonDecode(response.body);
         throw Exception(data['message'] as String? ?? 'Login failed');
@@ -84,11 +87,8 @@ class DbAuthRepository implements AuthRepository {
   @override
   Future<void> logOut() async {
     try {
-      // Clear SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
-
-      // Clear session cookie from ApiClient
       await _apiClient.clearSessionCookie();
       print('DbAuthRepository: Logged out');
     } catch (e) {
@@ -103,7 +103,7 @@ class DbAuthRepository implements AuthRepository {
       print('DbAuthRepository: Forgot password started for email: $email');
       final response = await _apiClient.post(
         '/forgot-password',
-        body: {'email': email}, // Use named parameter 'body'
+        body: {'email': email},
       );
 
       print(
