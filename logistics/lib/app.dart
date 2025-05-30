@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logistcs/appView.dart';
 import 'package:logistcs/blocs/admin/theme_bloc.dart';
 import 'package:logistcs/blocs/authorization/authentication_bloc.dart';
+import 'package:logistcs/components/shared_rider.dart';
 import 'package:logistcs/screens/admindashboarddrawer/feedbacks.dart';
 import 'package:logistcs/screens/admindashboarddrawer/preferences.dart';
 import 'package:logistcs/screens/admindashboarddrawer/profilescreen.dart';
@@ -23,6 +24,7 @@ import 'package:logistcs/screens/rider/add_new_rider/documents.dart';
 import 'package:logistcs/screens/rider/add_new_rider/emergencycontacts.dart';
 import 'package:logistcs/screens/rider/rider_management.dart';
 import 'package:logistcs/screens/rider/tracking/rider_tracking.dart';
+import 'package:logistcs/screens/rider/updaterider.dart';
 import 'package:logistcs/screens/sign_in_screen.dart';
 import 'package:logistcs/screens/usermanager.dart';
 
@@ -90,7 +92,16 @@ class MyApp extends StatelessWidget {
                 '/profilescreen': (context) => const ProfileScreen(),
                 '/preferencescreen': (context) => const PreferencesScreen(),
                 '/top5bestregions': (context) => const Top5Regions(),
-                '/feedbacks': (context) => const FeedBacks()
+                '/feedbacks': (context) => const FeedBacks(),
+                '/updaterider': (context) {
+                  final rider =
+                      ModalRoute.of(context)?.settings.arguments as Rider?;
+                  if (rider == null) {
+                    return const Scaffold(
+                        body: Center(child: Text('Error: Rider not provided')));
+                  }
+                  return RiderUpdateScreen(rider: rider);
+                },
               },
             );
           },

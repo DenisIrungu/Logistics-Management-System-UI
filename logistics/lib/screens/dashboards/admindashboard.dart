@@ -6,7 +6,6 @@ import 'package:logistcs/blocs/admin/admin_state.dart';
 import 'package:logistcs/components/mygrid.dart';
 import 'package:logistcs/components/drawer/custom_drawer.dart';
 import 'package:logistcs/components/priority.dart';
-import 'package:admin_repository/admin_repository.dart';
 
 class Admindashboard extends StatefulWidget {
   const Admindashboard({super.key});

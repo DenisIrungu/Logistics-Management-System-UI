@@ -38,9 +38,7 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
               onError: Colors.green,
               surface: const Color(
                   0xFF121212), // Dark surface (used by cards, dialogs)
-              onSurface: Colors.white, // Lighter text on dark surfaces
-              background:
-                  const Color(0xFF000000), // Black background for dark mode
+              onSurface: Colors.white, // Black background for dark mode
             )
           : ColorScheme.light(
               primary: const Color(0xFFFFFFFF),

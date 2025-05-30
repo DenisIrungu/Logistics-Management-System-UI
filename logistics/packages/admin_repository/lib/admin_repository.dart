@@ -1,4 +1,4 @@
-library admin_repository;
+library;
 
 export 'src/abstract_admin_repo.dart';
 export 'src/impliment_admin_repo.dart';

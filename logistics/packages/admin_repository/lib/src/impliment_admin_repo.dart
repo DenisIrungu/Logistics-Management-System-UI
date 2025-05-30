@@ -2,8 +2,6 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:admin_repository/admin_repository.dart';
 import 'package:logistcs/services/api_client.dart';
-import 'package:admin_repository/src/models/admin_profile_model.dart';
-import 'package:admin_repository/src/models/issue_model.dart';
 import 'package:admin_repository/src/models/region_model.dart';
 import 'package:admin_repository/src/models/feedback_model.dart';
 import 'package:http/http.dart' as http;
@@ -134,8 +132,9 @@ class DbAdminRepository implements AdminRepository {
       final fields = <String, String>{};
       if (name != null) fields['name'] = name;
       if (email != null) fields['email'] = email;
-      if (verificationCode != null)
+      if (verificationCode != null) {
         fields['verification_code'] = verificationCode;
+      }
 
       final response = await _apiClient.multipartPut(
         '/admin/profile',
