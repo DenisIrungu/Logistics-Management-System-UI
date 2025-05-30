@@ -51,12 +51,12 @@ class _AdmindashboardState extends State<Admindashboard> {
         textScaler: TextScaler.linear(textScaleFactor),
       ),
       child: Scaffold(
-        backgroundColor:
-            Theme.of(context).colorScheme.secondary.withOpacity(1.0),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        //  backgroundColor:
+        //Theme.of(context).colorScheme.secondary.withOpacity(1.0),
         appBar: AppBar(
           iconTheme: IconThemeData(color: Colors.white),
-          backgroundColor:
-              Theme.of(context).colorScheme.surface.withOpacity(1.0),
+          backgroundColor: Theme.of(context).colorScheme.surface,
           title: const Text(
             'Dashboard',
             style: TextStyle(

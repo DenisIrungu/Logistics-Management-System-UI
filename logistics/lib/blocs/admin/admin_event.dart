@@ -95,3 +95,33 @@ class ResendRiderEmail extends AdminEvent {
   @override
   List<Object?> get props => [email];
 }
+
+class UpdateRider extends AdminEvent {
+  final int riderId;
+  final Map<String, String> fields;
+  final Map<String, File> files;
+
+  const UpdateRider({
+    required this.riderId,
+    required this.fields,
+    required this.files,
+  });
+
+  @override
+  List<Object?> get props => [riderId, fields, files];
+}
+
+class FetchRiders extends AdminEvent {
+  final int skip;
+  final int limit;
+  final String? searchQuery;
+
+  const FetchRiders({
+    this.skip = 0,
+    this.limit = 10,
+    this.searchQuery,
+  });
+
+  @override
+  List<Object?> get props => [skip, limit, searchQuery];
+}

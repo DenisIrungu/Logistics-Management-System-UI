@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:logistcs/components/shared_rider.dart'; // Added for Rider
 
 class DbAdminRepository implements AdminRepository {
   final ApiClient _apiClient;
@@ -136,10 +137,15 @@ class DbAdminRepository implements AdminRepository {
         fields['verification_code'] = verificationCode;
       }
 
+      Map<String, File>? files;
+      if (profilePicture != null) {
+        files = {'file': profilePicture};
+      }
+
       final response = await _apiClient.multipartPut(
         '/admin/profile',
         fields: fields.isNotEmpty ? fields : null,
-        file: profilePicture,
+        files: files,
       );
 
       print('Update profile response: $response');
@@ -367,4 +373,82 @@ class DbAdminRepository implements AdminRepository {
       throw Exception('Failed to resend verification email: $e');
     }
   }
+
+  @override
+  Future<void> updateRider({
+    required int riderId,
+    required Map<String, String> fields,
+    required Map<String, File> files,
+  }) async {
+    try {
+      print(
+          'DbAdminRepository: Updating rider with riderId: $riderId, fields: $fields, files: ${files.keys}');
+
+      // Validate files are PDFs
+      for (var entry in files.entries) {
+        final file = entry.value;
+        if (!(await _isValidPdf(file))) {
+          throw Exception('File ${entry.key} is not a valid PDF');
+        }
+      }
+
+      final response = await _apiClient.multipartPut(
+        '/admin/riders/$riderId',
+        fields: fields,
+        files: files,
+      );
+
+      print('Update rider response: $response');
+      if (response is Map<String, dynamic>) {
+        return;
+      } else {
+        throw Exception(
+            'Expected a map for update rider response, but got: $response');
+      }
+    } catch (e) {
+      print('Error updating rider: $e');
+      throw Exception('Failed to update rider: $e');
+    }
+  }
+
+ @override
+Future<PaginatedRiders> fetchRiders({
+  int skip = 0,
+  int limit = 10,
+  String? searchQuery,
+}) async {
+  try {
+    final queryParams = <String, String>{
+      'skip': skip.toString(),
+      'limit': limit.toString(),
+    };
+    if (searchQuery != null && searchQuery.isNotEmpty) {
+      queryParams['search'] = searchQuery;
+    }
+
+    final uri = Uri.parse('/admin/riders').replace(queryParameters: queryParams);
+    final endpoint = uri.toString();
+    print('DbAdminRepository: Fetching riders from endpoint: $endpoint with params: $queryParams');
+
+    // Check session cookie
+    final prefs = await SharedPreferences.getInstance();
+    final session = prefs.getString('session_cookie');
+    print('DbAdminRepository: Session cookie for fetchRiders: $session');
+    if (session == null) {
+      throw Exception('Session cookie not found. Please log in again.');
+    }
+
+    final data = await _apiClient.get(endpoint);
+    print('DbAdminRepository: Raw fetch riders response: $data');
+
+    if (data is Map<String, dynamic>) {
+      return PaginatedRiders.fromJson(data);
+    } else {
+      throw Exception('Expected a map for riders response, but got: $data');
+    }
+  } catch (e) {
+    print('DbAdminRepository: Error fetching riders: $e');
+    throw Exception('Failed to fetch riders: $e');
+  }
+}
 }

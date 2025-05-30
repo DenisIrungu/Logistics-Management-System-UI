@@ -3,6 +3,10 @@ import 'package:file_picker/file_picker.dart';
 import 'package:logistcs/components/mytextfield.dart';
 import 'package:logistcs/components/shared_rider.dart';
 import 'dart:io';
+import 'package:flutter_bloc/flutter_bloc.dart'; // Added for BLoC
+import 'package:logistcs/blocs/admin/admin_bloc.dart'; // Added for AdminBloc
+import 'package:logistcs/blocs/admin/admin_event.dart'; // Added for AdminEvent
+import 'package:logistcs/blocs/admin/admin_state.dart'; // Added for AdminState
 
 class RiderUpdateScreen extends StatefulWidget {
   final Rider rider;
@@ -86,11 +90,69 @@ class _RiderUpdateScreenState extends State<RiderUpdateScreen> {
 
   Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
-      // Placeholder for submit logic (to be replaced with API call)
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Update functionality placeholder')),
-      );
-      Navigator.pop(context);
+      // Prepare fields map (only include non-empty fields)
+      final fields = <String, String>{};
+      if (_firstNameController.text.isNotEmpty &&
+          _firstNameController.text != widget.rider.name.split(' ').first) {
+        fields['first_name'] = _firstNameController.text;
+      }
+      if (_lastNameController.text.isNotEmpty &&
+          _lastNameController.text !=
+              widget.rider.name.split(' ').sublist(1).join(' ')) {
+        fields['last_name'] = _lastNameController.text;
+      }
+      if (_emailController.text.isNotEmpty &&
+          _emailController.text != widget.rider.email) {
+        fields['email'] = _emailController.text;
+      }
+      if (_phoneController.text.isNotEmpty &&
+          _phoneController.text != widget.rider.phoneNumber) {
+        fields['phone_number'] = _phoneController.text;
+      }
+      if (_bikeModelController.text.isNotEmpty &&
+          _bikeModelController.text != widget.rider.bikeModel) {
+        fields['bike_model'] = _bikeModelController.text;
+      }
+      if (_bikeColorController.text.isNotEmpty &&
+          _bikeColorController.text != widget.rider.bikeColor) {
+        fields['bike_color'] = _bikeColorController.text;
+      }
+      if (_bikeNumberController.text.isNotEmpty &&
+          _bikeNumberController.text != widget.rider.bikeNumber) {
+        fields['bike_number'] = _bikeNumberController.text;
+      }
+      if (_licenseController.text.isNotEmpty &&
+          _licenseController.text != widget.rider.license) {
+        fields['license'] = _licenseController.text;
+      }
+      if (_emergencyNameController.text.isNotEmpty &&
+          _emergencyNameController.text != widget.rider.emergencyContactName) {
+        fields['emergency_contact_name'] = _emergencyNameController.text;
+      }
+      if (_emergencyPhoneController.text.isNotEmpty &&
+          _emergencyPhoneController.text != widget.rider.emergencyContactPhone) {
+        fields['emergency_contact_phone'] = _emergencyPhoneController.text;
+      }
+      if (_relationshipController.text.isNotEmpty &&
+          _relationshipController.text != widget.rider.emergencyContactRelationship) {
+        fields['emergency_contact_relationship'] = _relationshipController.text;
+      }
+
+      // Prepare files map
+      final files = <String, File>{};
+      if (_drivingLicenseFile != null) {
+        files['driving_license'] = File(_drivingLicenseFile!.path!);
+      }
+      if (_insuranceFile != null) {
+        files['insurance'] = File(_insuranceFile!.path!);
+      }
+
+      // Dispatch UpdateRider event
+      BlocProvider.of<AdminBloc>(context).add(UpdateRider(
+        riderId: widget.rider.id,
+        fields: fields,
+        files: files,
+      ));
     }
   }
 
@@ -308,16 +370,40 @@ class _RiderUpdateScreenState extends State<RiderUpdateScreen> {
                 ],
               ),
               const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _submit,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0F0156),
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-                child: const Text('Save Changes',
-                    style: TextStyle(color: Colors.white)),
+              BlocBuilder<AdminBloc, AdminBlocState>(
+                builder: (context, state) {
+                  if (state.riderUpdateState is RiderUpdateLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  return ElevatedButton(
+                    onPressed: _submit,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0F0156),
+                      minimumSize: const Size(double.infinity, 50),
+                    ),
+                    child: const Text('Save Changes',
+                        style: TextStyle(color: Colors.white)),
+                  );
+                },
               ),
               const SizedBox(height: 16),
+              // Handle success and failure states
+              BlocListener<AdminBloc, AdminBlocState>(
+                listener: (context, state) {
+                  if (state.riderUpdateState is RiderUpdateSuccess) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Rider updated successfully')),
+                    );
+                    Navigator.pop(context);
+                  } else if (state.riderUpdateState is RiderUpdateFailure) {
+                    final failure = state.riderUpdateState as RiderUpdateFailure;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Failed to update rider: ${failure.error}')),
+                    );
+                  }
+                },
+                child: const SizedBox.shrink(),
+              ),
             ],
           ),
         ),

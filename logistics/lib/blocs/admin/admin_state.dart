@@ -3,6 +3,7 @@ import 'package:admin_repository/src/models/region_model.dart';
 import 'package:admin_repository/src/entities/entities_admin_profile.dart';
 import 'package:admin_repository/src/entities/entities_issue.dart';
 import 'package:admin_repository/src/models/feedback_model.dart';
+import 'package:logistcs/components/shared_rider.dart'; // Added for Rider
 
 class AdminBlocState extends Equatable {
   final ProfileState profileState;
@@ -13,6 +14,8 @@ class AdminBlocState extends Equatable {
   final TopRegionsState topRegionsState;
   final FeedbackState feedbackState;
   final RiderRegistrationState riderRegistrationState;
+  final RiderUpdateState riderUpdateState;
+  final RidersState ridersState;
 
   const AdminBlocState({
     this.profileState = const ProfileLoading(),
@@ -23,6 +26,8 @@ class AdminBlocState extends Equatable {
     this.topRegionsState = const TopRegionsInitial(),
     this.feedbackState = const FeedbackLoading(),
     this.riderRegistrationState = const RiderRegistrationInitial(),
+    this.riderUpdateState = const RiderUpdateInitial(),
+    this.ridersState = const RidersInitial(),
   });
 
   AdminBlocState copyWith({
@@ -34,6 +39,8 @@ class AdminBlocState extends Equatable {
     TopRegionsState? topRegionsState,
     FeedbackState? feedbackState,
     RiderRegistrationState? riderRegistrationState,
+    RiderUpdateState? riderUpdateState,
+    RidersState? ridersState,
   }) {
     return AdminBlocState(
       profileState: profileState ?? this.profileState,
@@ -44,6 +51,8 @@ class AdminBlocState extends Equatable {
       topRegionsState: topRegionsState ?? this.topRegionsState,
       feedbackState: feedbackState ?? this.feedbackState,
       riderRegistrationState: riderRegistrationState ?? this.riderRegistrationState,
+      riderUpdateState: riderUpdateState ?? this.riderUpdateState,
+      ridersState: ridersState ?? this.ridersState,
     );
   }
 
@@ -57,6 +66,8 @@ class AdminBlocState extends Equatable {
         topRegionsState,
         feedbackState,
         riderRegistrationState,
+        riderUpdateState,
+        ridersState,
       ];
 }
 
@@ -301,6 +312,73 @@ class RiderRegistrationFailure extends RiderRegistrationState {
   final String error;
 
   const RiderRegistrationFailure(this.error);
+
+  @override
+  List<Object?> get props => [error];
+}
+
+// Rider Update States
+abstract class RiderUpdateState extends Equatable {
+  const RiderUpdateState();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class RiderUpdateInitial extends RiderUpdateState {
+  const RiderUpdateInitial();
+}
+
+class RiderUpdateLoading extends RiderUpdateState {
+  const RiderUpdateLoading();
+}
+
+class RiderUpdateSuccess extends RiderUpdateState {
+  const RiderUpdateSuccess();
+}
+
+class RiderUpdateFailure extends RiderUpdateState {
+  final String error;
+
+  const RiderUpdateFailure(this.error);
+
+  @override
+  List<Object?> get props => [error];
+}
+
+// Riders States
+// Riders States
+abstract class RidersState extends Equatable {
+  const RidersState();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class RidersInitial extends RidersState {
+  const RidersInitial();
+}
+
+class RidersLoading extends RidersState {
+  const RidersLoading();
+}
+
+class RidersSuccess extends RidersState {
+  final List<Rider> riders;
+  final int total;
+  final int skip;
+  final int limit;
+
+  const RidersSuccess(this.riders, this.total, this.skip, this.limit);
+
+  @override
+  List<Object?> get props => [riders, total, skip, limit];
+}
+
+class RidersFailure extends RidersState {
+  final String error;
+
+  const RidersFailure(this.error);
 
   @override
   List<Object?> get props => [error];

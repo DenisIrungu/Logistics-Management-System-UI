@@ -1,19 +1,21 @@
 import 'package:bloc/bloc.dart';
 import 'package:admin_repository/admin_repository.dart';
 import 'package:logistcs/blocs/admin/theme_bloc.dart';
+import 'package:logistcs/components/shared_rider.dart';
 import 'admin_event.dart';
 import 'admin_state.dart';
 
 class AdminBloc extends Bloc<AdminEvent, AdminBlocState> {
   final AdminRepository adminRepository;
-  final ThemeBloc themeBloc;
+  final ThemeBloc? themeBloc; // Nullable
   AdminProfile? _cachedProfile;
 
   AdminBloc({
     required this.adminRepository,
-    required this.themeBloc,
+    this.themeBloc, // Made optional
   }) : super(const AdminBlocState()) {
-    print('AdminBloc: Initializing event handlers');
+    print(
+        'AdminBloc: Initializing event handlers with themeBloc: ${themeBloc != null}');
     on<FetchAdminProfile>(_onFetchAdminProfile);
     on<FetchPriorities>(_onFetchPriorities);
     on<FetchNotificationsCount>(_onFetchNotificationsCount);
@@ -25,6 +27,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminBlocState> {
     on<FetchFeedbacks>(_onFetchFeedbacks);
     on<RegisterRider>(_onRegisterRider);
     on<ResendRiderEmail>(_onResendRiderEmail);
+    on<UpdateRider>(_onUpdateRider);
+    on<FetchRiders>(_onFetchRiders);
   }
 
   Future<void> _onFetchAdminProfile(
@@ -175,7 +179,11 @@ class AdminBloc extends Bloc<AdminEvent, AdminBlocState> {
         updateState: const UpdateSuccess(),
       ));
 
-      themeBloc.add(UpdateTheme(event.theme));
+      // Use null-safe operator to handle nullable themeBloc
+      themeBloc?.add(UpdateTheme(event.theme));
+      if (themeBloc == null) {
+        print('AdminBloc: themeBloc is null, skipping theme update');
+      }
     } catch (e) {
       emit(state.copyWith(
         updateState: UpdateFailure(e.toString()),
@@ -221,7 +229,6 @@ class AdminBloc extends Bloc<AdminEvent, AdminBlocState> {
   ) async {
     print(
         'AdminBloc: Handling RegisterRider event with data: ${event.riderData}');
-    // Validate inputs
     final email = event.riderData['email'] as String?;
     final termsAcceptedStr = event.riderData['terms_accepted'] as String?;
     final termsAccepted = termsAcceptedStr?.toLowerCase() == 'true';
@@ -245,20 +252,15 @@ class AdminBloc extends Bloc<AdminEvent, AdminBlocState> {
       return;
     }
 
-    // Emit loading state
     emit(state.copyWith(
         riderRegistrationState: const RiderRegistrationLoading()));
     print('AdminBloc: Emitting RiderRegistrationLoading');
 
     try {
       print('AdminBloc: Calling registerRider with data: ${event.riderData}');
-      // Call repository method (cookie handled in repository)
-      await adminRepository.registerRider(
-        riderData: event.riderData,
-      );
+      await adminRepository.registerRider(riderData: event.riderData);
       print('AdminBloc: registerRider call completed successfully');
 
-      // Emit success state
       emit(state.copyWith(
           riderRegistrationState: const RiderRegistrationSuccess()));
       print('AdminBloc: Emitting RiderRegistrationSuccess');
@@ -275,18 +277,68 @@ class AdminBloc extends Bloc<AdminEvent, AdminBlocState> {
     ResendRiderEmail event,
     Emitter<AdminBlocState> emit,
   ) async {
-    print('AdminBloc: Handling ResendRiderEmail event for email: ${event.email}');
-    emit(state.copyWith(riderRegistrationState: const RiderRegistrationLoading()));
+    print(
+        'AdminBloc: Handling ResendRiderEmail event for email: ${event.email}');
+    emit(state.copyWith(
+        riderRegistrationState: const RiderRegistrationLoading()));
     try {
       await adminRepository.resendVerificationEmail(event.email);
       emit(state.copyWith(
-        riderRegistrationState: const RiderRegistrationSuccess(),
-      ));
+          riderRegistrationState: const RiderRegistrationSuccess()));
     } catch (e) {
       print('AdminBloc: Error during resend email: $e');
       emit(state.copyWith(
         riderRegistrationState: RiderRegistrationFailure(e.toString()),
       ));
+    }
+  }
+
+  Future<void> _onUpdateRider(
+    UpdateRider event,
+    Emitter<AdminBlocState> emit,
+  ) async {
+    print(
+        'AdminBloc: Handling UpdateRider event for riderId: ${event.riderId}, fields: ${event.fields}, files: ${event.files.keys}');
+    emit(state.copyWith(riderUpdateState: const RiderUpdateLoading()));
+    try {
+      await adminRepository.updateRider(
+        riderId: event.riderId,
+        fields: event.fields,
+        files: event.files,
+      );
+      print('AdminBloc: Rider update completed successfully');
+      emit(state.copyWith(riderUpdateState: const RiderUpdateSuccess()));
+    } catch (e) {
+      print('AdminBloc: Error during rider update: $e');
+      emit(state.copyWith(riderUpdateState: RiderUpdateFailure(e.toString())));
+    }
+  }
+
+  Future<void> _onFetchRiders(
+    FetchRiders event,
+    Emitter<AdminBlocState> emit,
+  ) async {
+    print(
+        'AdminBloc: FetchRiders event triggered with skip: ${event.skip}, limit: ${event.limit}, query: ${event.searchQuery}');
+    emit(state.copyWith(ridersState: const RidersLoading()));
+    try {
+      final paginatedRiders = await adminRepository.fetchRiders(
+        skip: event.skip,
+        limit: event.limit,
+        searchQuery: event.searchQuery,
+      );
+      print(
+          'AdminBloc: Emitting RidersSuccess with ${paginatedRiders.riders.length} riders, total: ${paginatedRiders.total}');
+      emit(state.copyWith(
+          ridersState: RidersSuccess(
+        paginatedRiders.riders,
+        paginatedRiders.total,
+        paginatedRiders.skip,
+        paginatedRiders.limit,
+      )));
+    } catch (e) {
+      print('AdminBloc: Error fetching riders: $e');
+      emit(state.copyWith(ridersState: RidersFailure(e.toString())));
     }
   }
 }

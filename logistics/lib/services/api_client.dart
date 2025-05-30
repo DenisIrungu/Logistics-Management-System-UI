@@ -66,20 +66,23 @@ class ApiClient {
     String endpoint, {
     Map<String, dynamic>? body,
     Map<String, String>? queryParams,
-    bool useFormData = false, // New parameter to switch between JSON and form-data
+    bool useFormData =
+        false, // New parameter to switch between JSON and form-data
   }) async {
     final uri = Uri.parse('$baseUrl$endpoint').replace(
       queryParameters: queryParams,
     );
 
-    print('ApiClient: Making POST request to $uri with body: $body, useFormData: $useFormData');
+    print(
+        'ApiClient: Making POST request to $uri with body: $body, useFormData: $useFormData');
     print('ApiClient: Headers: {'
         'Cookie: ${sessionCookie ?? 'none'}}');
 
     http.Response response;
     if (useFormData && body != null) {
       final request = http.MultipartRequest('POST', uri)
-        ..fields.addAll(body.map((key, value) => MapEntry(key, value.toString())))
+        ..fields
+            .addAll(body.map((key, value) => MapEntry(key, value.toString())))
         ..headers.addAll({
           if (sessionCookie != null) 'Cookie': sessionCookie!,
         });
@@ -116,10 +119,11 @@ class ApiClient {
     return response;
   }
 
+  // Replace the existing multipartPut method in api_client.dart
   Future<dynamic> multipartPut(
     String endpoint, {
     Map<String, String>? fields,
-    File? file,
+    Map<String, File>? files,
   }) async {
     final request =
         http.MultipartRequest('PUT', Uri.parse('$baseUrl$endpoint'));
@@ -132,21 +136,25 @@ class ApiClient {
       request.fields.addAll(fields);
     }
 
-    if (file != null) {
-      final mimeType = lookupMimeType(file.path) ?? 'image/jpeg';
-      print('ApiClient: File MIME type: $mimeType');
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'file',
-          file.path,
-          contentType: MediaType.parse(mimeType),
-        ),
-      );
+    if (files != null) {
+      for (var entry in files.entries) {
+        final file = entry.value;
+        final mimeType = lookupMimeType(file.path) ?? 'application/pdf';
+        print('ApiClient: File MIME type for ${entry.key}: $mimeType');
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            entry
+                .key, // Use the map key as the field name (e.g., 'driving_license')
+            file.path,
+            contentType: MediaType.parse(mimeType),
+          ),
+        );
+      }
     }
 
     print('ApiClient: Making multipart PUT request to $endpoint');
     print('ApiClient: Fields: $fields');
-    print('ApiClient: File: ${file?.path}');
+    print('ApiClient: Files: ${files?.keys.join(", ")}');
 
     final response = await request.send();
     final responseBody = await response.stream.bytesToString();

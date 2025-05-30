@@ -7,7 +7,7 @@ class Rider {
   final String bikeModel;
   final String bikeColor;
   final String license;
-  final String idDocument;
+  final String? idDocument; // Changed to nullable
   final String? drivingLicense;
   final String? insurance;
   final String emergencyContactName;
@@ -26,7 +26,7 @@ class Rider {
     required this.bikeModel,
     required this.bikeColor,
     required this.license,
-    required this.idDocument,
+    this.idDocument,
     this.drivingLicense,
     this.insurance,
     required this.emergencyContactName,
@@ -47,7 +47,7 @@ class Rider {
       bikeModel: json['bike_model'] as String,
       bikeColor: json['bike_color'] as String,
       license: json['license'] as String,
-      idDocument: json['id_document'] as String,
+      idDocument: json['id_document'] as String?, // Updated to nullable
       drivingLicense: json['driving_license'] as String?,
       insurance: json['insurance'] as String?,
       emergencyContactName: json['emergency_contact_name'] as String,

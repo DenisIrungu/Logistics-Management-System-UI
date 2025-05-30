@@ -3,6 +3,7 @@ import 'package:admin_repository/src/entities/entities_admin_profile.dart';
 import 'package:admin_repository/src/entities/entities_issue.dart';
 import 'package:admin_repository/src/models/region_model.dart';
 import 'package:admin_repository/src/models/feedback_model.dart';
+import 'package:logistcs/components/shared_rider.dart'; // Added for Rider
 
 abstract class AdminRepository {
   Future<AdminProfile> fetchAdminProfile();
@@ -29,4 +30,14 @@ abstract class AdminRepository {
     required Map<String, dynamic> riderData,
   });
   Future<void> resendVerificationEmail(String email);
+  Future<void> updateRider({
+    required int riderId,
+    required Map<String, String> fields,
+    required Map<String, File> files,
+  });
+  Future<PaginatedRiders> fetchRiders({
+    int skip = 0,
+    int limit = 10,
+    String? searchQuery,
+  });
 }
